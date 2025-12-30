@@ -84,10 +84,7 @@ Add basic monitoring and logging
 
 
 Python script used :
-
 #!/usr/bin/env python3
-# modbus_enum_safe.py
-# SAFE Modbus HMI test – ignores button registers (0–2)
 
 import socket
 import struct
@@ -97,19 +94,11 @@ TARGET_IP = "192.168.0.200"
 MB_PORT = 502
 TIMEOUT = 2
 
-# ---------------- MODBUS FUNCTIONS ---------------- #
-
 def modbus_read_holding(slave_id, start_addr, count=1):
     try:
-        tid = 1
-        pid = 0
-        uid = slave_id
-        fc = 0x03
-        length = 6
-
         pkt = struct.pack(
             ">HHHBBHH",
-            tid, pid, length, uid, fc, start_addr, count
+            1, 0, 6, slave_id, 0x03, start_addr, count
         )
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -119,11 +108,7 @@ def modbus_read_holding(slave_id, start_addr, count=1):
         resp = sock.recv(1024)
         sock.close()
 
-        if len(resp) < 11:
-            return None
-
-        byte_count = resp[8]
-        if byte_count < 2:
+        if len(resp) < 11 or resp[8] < 2:
             return None
 
         return struct.unpack(">H", resp[9:11])[0]
@@ -134,15 +119,9 @@ def modbus_read_holding(slave_id, start_addr, count=1):
 
 def modbus_write_single(slave_id, reg_addr, value):
     try:
-        tid = 1
-        pid = 0
-        uid = slave_id
-        fc = 0x06
-        length = 6
-
         pkt = struct.pack(
             ">HHHBBHH",
-            tid, pid, length, uid, fc, reg_addr, value
+            1, 0, 6, slave_id, 0x06, reg_addr, value
         )
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -152,20 +131,17 @@ def modbus_write_single(slave_id, reg_addr, value):
         resp = sock.recv(1024)
         sock.close()
 
-        return len(resp) >= 12 and resp[7] == fc
+        return len(resp) >= 12 and resp[7] == 0x06
 
     except:
         return False
 
-
-# ---------------- MAIN LOGIC ---------------- #
 
 print("\n📺 HMI MODBUS ENUM – SAFE MODE\n")
 
 for slave in [0, 1]:
     print(f"\n🔍 SLAVE {slave}")
 
-    # Read all 8 registers
     regs = []
     for r in range(8):
         val = modbus_read_holding(slave, r, 1)
@@ -175,17 +151,14 @@ for slave in [0, 1]:
     for i, v in enumerate(regs):
         print(f"  Reg {i}: {v}")
 
-    # Only registers 3–7 are value boxes
     test_values = [400, 300, 200, 500, 600]
 
     print("\n🧪 Writing VALUE BOXES (Reg 3–7)\n")
 
     for i, test_val in enumerate(test_values):
         reg = i + 3
-
         print(
-            f"  Box {i+1} (Reg {reg}): "
-            f"{regs[reg]} → {test_val}",
+            f"  Box {i+1} (Reg {reg}): {regs[reg]} → {test_val}",
             end=" "
         )
 
@@ -197,8 +170,6 @@ for slave in [0, 1]:
             print("❌ WRITE FAILED")
 
 print("\n✅ DONE\n")
-
-
 
 
 this code was used to change the value 
