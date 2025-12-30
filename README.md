@@ -189,7 +189,9 @@ ping ipaddress
 kali and kit should be on same network gatway 
 
 
+![1M](https://github.com/user-attachments/assets/8eeb24a1-d221-4021-90e4-915cf6d712dd)
 
+![2](https://github.com/user-attachments/assets/1462085c-6fd3-4946-ae6c-47e9d95410d4)
 
 
 
@@ -208,11 +210,8 @@ was not abale to change the light from red -> yellow -> green or any bcz andon s
 
 📁 Repository Info
 This repository contains:
-
 Pentest report
-
 Modbus testing scripts
-
 Network scan results
 
-⚠️ This testing was done only on an authorized lab device for learning purposes.
+⚠️ This testing was done only on an authorized lab device for learning purposes , dont try this on any device if done not my responsibility  .
